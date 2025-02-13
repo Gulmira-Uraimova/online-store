@@ -8,12 +8,18 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../features/slices/productSlice';
+import { deleteProduct, fetchProducts } from '../../features/slices/productSlice';
 import { Skeleton, Stack, TextField } from '@mui/material';
 // import LinearIndeterminate from '../../components/loading/Loading';
 import DehazeIcon from '@mui/icons-material/Dehaze';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Link } from 'react-router-dom';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import './ProductPage.css'
+
+
+const ITEMS_PER_PAGE = 2
 
 
 const ProductsPage = () => {
@@ -21,12 +27,19 @@ const ProductsPage = () => {
     const dispatch = useDispatch()
     const [isOpen, setIsOpen] = useState(false)
     const [search, setSearch] = useState('')
+    const [currentPage, setCurrentPage] = useState(1)
     
 
   useEffect(() => {
     dispatch(fetchProducts())
   }, [])
   const filterProducts = products.filter(product => product.title.toLowerCase().includes(search.toLowerCase()))
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+  const currentProducts = filterProducts.slice(startIndex, endIndex)
+
+  const totalPages = Math.ceil(filterProducts.length / ITEMS_PER_PAGE)
   
 
   // if (error) return <div>Продукты не найдены!</div>
@@ -40,24 +53,12 @@ const ProductsPage = () => {
       id="filled-basic" 
       label="Поиск" 
       variant="filled" 
-      sx={{
-        width: '1440',
-        marginTop: '40px', 
-        marginLeft:'40px', 
-        outlined: 'none'  
-      }} 
+      className='products__search'
       onChange={(e) => setSearch(e.target.value)}
    />
-     <div 
-       style={{
-        width: '1520',
-        height: '3200',
-        display: 'flex', 
-        flexWrap: 'wrap', 
-        justifyContent: 'space-around'
-      }}
+     <div className='products'
     >
-       {filterProducts.map(product => 
+       {currentProducts.map(product => 
        loading ? (
           <Stack
             spacing={1} key={product.id} sx={{width: 430, height: 400, marginTop: '40px'}}>
@@ -70,14 +71,7 @@ const ProductsPage = () => {
          
         ) : (
           <Card 
-            sx={{ 
-             width: 430, 
-             height: 450, 
-             display: 'flex', 
-             flexDirection: 'column', 
-             justifyContent: 'space-around',
-             marginTop: '50'
-         }} 
+            className='products__image'
          key={product.id} >
           <CardMedia
             component="img"
@@ -89,32 +83,58 @@ const ProductsPage = () => {
           />
           <CardContent>
             <Typography gutterBottom variant="h5" component="div">
-              <Link to={ `/details-product/${product.id}`}>
+              <Link to={ `/details-product/${product.id}`} className='products__title'>
               {product.title}
               </Link>
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '20px' }}>
-              <strong>Price:</strong> {product.price}
+            <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'text.secondary', 
+              fontSize: '20px' }}>
+              <strong>Цена:</strong><span className='products__price'
+              >
+                  {product.price}</span> сом
             </Typography>
           </CardContent>
-          <CardActions sx={{display: 'flex', justifyContent: 'flex-end'}}>
+          <CardActions 
+          className='products__delete'>
             {isOpen ? (
               <>
-                <Button variant='outlined' color='error' startIcon={<DeleteIcon/>}
-                // sx={marginRight: '15'}
-                >Удалить</Button> 
-                <Button color='secondary' startIcon={<ModeEditOutlineIcon />}
-                >Изменить</Button>
-                <MenuOpenIcon sx={{marginRight: '20px', cursor: 'pointer'}} onClick={() => setIsOpen(!isOpen)} />
+                <Button 
+                  variant='outlined' 
+                  color='error' 
+                  startIcon={<DeleteIcon/>}
+                  onClick={()=> dispatch(deleteProduct(product.id))}
+                >
+                  Удалить
+                </Button> 
+                <Link to={`/update-product/${product.id}`}>
+                  <Button 
+                    color='secondary' 
+                    startIcon={<ModeEditOutlineIcon />}
+                  >
+                     Изменить
+                  </Button>
+                </Link>
+                
+                <MenuOpenIcon className='products__moi' onClick={() => setIsOpen(!isOpen)} />
               </>
             ) : (
-                <DehazeIcon sx={{marginRight: '20px', cursor: 'pointer'}} onClick={() => setIsOpen(!isOpen)} />
+                <DehazeIcon className='products__icon' onClick={() => setIsOpen(!isOpen)} />
             )}
 
            </CardActions>
         </Card>
       ))
       }
+    </div>
+    <div className='pagination'>
+      <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}><KeyboardDoubleArrowLeftIcon /></button>
+      <span>{currentPage} / {totalPages}</span>
+
+      <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}><KeyboardDoubleArrowRightIcon /></button>
+      
     </div>
    </>
   )

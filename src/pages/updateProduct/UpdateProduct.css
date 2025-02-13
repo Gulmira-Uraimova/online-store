@@ -1,0 +1,16 @@
+.block{
+    width: 400px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 100px auto;
+}
+.inp{
+    width: 100%;
+}
+.btn{
+    width: 300px;
+    padding: 10px 0;
+}

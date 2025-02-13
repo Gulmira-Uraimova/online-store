@@ -1,0 +1,36 @@
+.details{
+    width: 1000px;
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: aqua;
+}
+.details img{
+    width: 300px;
+}
+.details__card{
+    margin-left: 100px;
+}
+.details__card h3{
+    margin-top: 20px;
+}
+.details__card h3 span{
+    color: orangered;
+}
+.details__card p{
+    margin-top: 20px;
+}
+.rating{
+    width: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+   
+
+}
+.details__btn{
+    padding: 10px 15px;
+    margin-top: 30px;
+}
